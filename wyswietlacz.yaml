@@ -45,97 +45,49 @@ time:
   - platform: homeassistant
     id: ha_time
 
+image:
+  - file: https://raw.githubusercontent.com/voltronicpl/wyswietlacz/main/images/tlo.png
+    id: tlo
+    type: RGB565
+
 font:
-  - file: "gfonts://Roboto"
-    id: f12
-    size: 12
-    glyphsets: [GF_Latin_Core]
-  - file: "gfonts://Roboto"
-    id: f16
-    size: 16
-    glyphsets: [GF_Latin_Core]
-  - file: "gfonts://Roboto"
-    id: f20
+  - file: "gfonts://Roboto@700"
+    id: b20
     size: 20
     glyphsets: [GF_Latin_Core]
-  - file: "gfonts://Roboto"
-    id: f26
-    size: 26
+  - file: "gfonts://Roboto@700"
+    id: b16
+    size: 16
+    glyphsets: [GF_Latin_Core]
+  - file: "gfonts://Roboto@700"
+    id: b14
+    size: 14
+    glyphsets: [GF_Latin_Core]
+  - file: "gfonts://Roboto@700"
+    id: b11
+    size: 11
+    glyphsets: [GF_Latin_Core]
+  - file: "gfonts://Roboto@500"
+    id: m10
+    size: 10
     glyphsets: [GF_Latin_Core]
 
-image:
-  - file: https://raw.githubusercontent.com/voltronicpl/wyswietlacz/main/images/pv.png
-    id: i_pv
-    type: RGB565
-    transparency: alpha_channel
-  - file: https://raw.githubusercontent.com/voltronicpl/wyswietlacz/main/images/dom.png
-    id: i_dom
-    type: RGB565
-    transparency: alpha_channel
-  - file: https://raw.githubusercontent.com/voltronicpl/wyswietlacz/main/images/bateria.png
-    id: i_bat
-    type: RGB565
-    transparency: alpha_channel
-  - file: https://raw.githubusercontent.com/voltronicpl/wyswietlacz/main/images/siec.png
-    id: i_siec
-    type: RGB565
-    transparency: alpha_channel
-  - file: https://raw.githubusercontent.com/voltronicpl/wyswietlacz/main/images/woda.png
-    id: i_woda
-    type: RGB565
-    transparency: alpha_channel
-
 sensor:
-  - platform: homeassistant
-    id: pv1_power
-    entity_id: sensor.modbus_falownik_pv1_moc
-    internal: true
-
-  - platform: homeassistant
-    id: load_power
-    entity_id: sensor.modbus_falownik_obciazenie_moc_suma
-    internal: true
-
-  - platform: homeassistant
-    id: grid_power
-    entity_id: sensor.modbus_falownik_siec_moc_suma
-    internal: true
-
-  - platform: homeassistant
-    id: battery_power
-    entity_id: sensor.modbus_falownik_bateria_moc
-    internal: true
-
-  - platform: homeassistant
-    id: battery_soc
-    entity_id: sensor.modbus_falownik_bateria_soc
-    internal: true
-
-  # ===== NOWE - podmień nazwy encji na swoje. Jak encja nie istnieje, na ekranie będzie "--" =====
-  - platform: homeassistant
-    id: pv_today
-    entity_id: sensor.ZMIEN_pv_dzis_kwh
-    internal: true
-
-  - platform: homeassistant
-    id: load_today
-    entity_id: sensor.ZMIEN_zuzycie_dzis_kwh
-    internal: true
-
-  - platform: homeassistant
-    id: export_today
-    entity_id: sensor.ZMIEN_eksport_dzis_kwh
-    internal: true
-
-  - platform: homeassistant
-    id: water_flow
-    entity_id: sensor.ZMIEN_woda_przeplyw
-    internal: true
-
-  - platform: homeassistant
-    id: water_today
-    entity_id: sensor.ZMIEN_woda_dzis
-    internal: true
+  # ---- moc ----
+  - { platform: homeassistant, id: pv1,  entity_id: sensor.modbus_falownik_pv1_moc, internal: true }
+  - { platform: homeassistant, id: pv2,  entity_id: sensor.modbus_falownik_pv2_moc, internal: true }
+  - { platform: homeassistant, id: load, entity_id: sensor.modbus_falownik_obciazenie_moc_suma, internal: true }
+  - { platform: homeassistant, id: grid, entity_id: sensor.modbus_falownik_siec_moc_suma, internal: true }
+  - { platform: homeassistant, id: bat,  entity_id: sensor.modbus_falownik_bateria_moc, internal: true }
+  - { platform: homeassistant, id: soc,  entity_id: sensor.modbus_falownik_bateria_soc, internal: true }
+  # ---- liczniki dzisiaj ----
+  - { platform: homeassistant, id: e_pv,  entity_id: sensor.modbus_falownik_energia_pv_produkcja_dzisiaj, internal: true }
+  - { platform: homeassistant, id: e_load, entity_id: sensor.modbus_falownik_energia_zuzycie_dom_dzisiaj, internal: true }
+  - { platform: homeassistant, id: e_imp, entity_id: sensor.modbus_falownik_energia_siec_import_dzisiaj, internal: true }
+  - { platform: homeassistant, id: e_exp, entity_id: sensor.modbus_falownik_energia_siec_export_dzisiaj, internal: true }
+  # ---- woda ----
+  - { platform: homeassistant, id: w_dzis, entity_id: sensor.miernikwody_zuzycie_wody_dzisiaj_m3, internal: true }
+  - { platform: homeassistant, id: w_mies, entity_id: sensor.ZMIEN_woda_miesiac_m3, internal: true }
 
 display:
   - platform: mipi_spi
@@ -144,180 +96,125 @@ display:
     cs_pin: GPIO15
     dc_pin: GPIO2
     reset_pin: GPIO4
-
     dimensions:
       width: 320
       height: 480
-
+    # POZIOMO 480x320. Jak obraz będzie do góry nogami / lustrzany - zmieniaj mirror_x / mirror_y
     transform:
-      swap_xy: false
-      mirror_x: false
+      swap_xy: true
+      mirror_x: true
       mirror_y: true
-
     pixel_mode: 18bit
     color_order: bgr
     invert_colors: false
-    update_interval: 500ms
+    update_interval: 300ms
 
     lambda: |-
-      // ---------- kolory ----------
-      auto bg     = Color(18,18,18);
-      auto card   = Color(30,30,30);
-      auto white  = Color(245,245,245);
-      auto muted  = Color(138,138,138);
-      auto line_off = Color(58,58,58);
-      auto pv_c   = Color(255,160,0);
-      auto grid_c = Color(80,170,255);
-      auto home_c = Color(70,210,210);
-      auto bat_c  = Color(180,120,255);
-      auto water_c= Color(58,167,232);
-      auto green  = Color(80,220,160);
-      auto red    = Color(255,90,130);
+      id(lcd_bl).turn_on();
+      it.image(0, 0, id(tlo));
 
-      // ---------- dane ----------
-      float pv   = id(pv1_power).state;   if (isnan(pv)) pv = 0;
-      float load = id(load_power).state;  if (isnan(load)) load = 0;
-      float grid = id(grid_power).state;  if (isnan(grid)) grid = 0;
-      float bat  = id(battery_power).state; if (isnan(bat)) bat = 0;
-      float soc  = id(battery_soc).state; if (isnan(soc)) soc = 0;
-      if (soc < 0) soc = 0; if (soc > 100) soc = 100;
+      auto white  = Color(255,255,255);
+      auto unitc  = Color(232,238,245);
+      auto muted  = Color(159,176,192);
+      auto green  = Color(62,240,160);
+      auto lgreen = Color(93,255,138);
+      auto orange = Color(255,194,58);
+      auto coral  = Color(255,138,106);
+      auto dim    = Color(70,84,94);
 
-      it.fill(bg);
+      auto v = [](sensor::Sensor *s) -> float { float x = s->state; return isnan(x) ? 0.0f : x; };
+      float p1 = v(id(pv1)), p2 = v(id(pv2)), pv = p1 + p2;
+      float ld = v(id(load)), gr = v(id(grid)), bt = v(id(bat)), sc = v(id(soc));
 
-      // ---------- helpery ----------
-      auto rcard = [&](int x, int y, int w, int h, Color border) {
-        int r = 10;
-        it.filled_rectangle(x + r, y, w - 2*r, h, border);
-        it.filled_rectangle(x, y + r, w, h - 2*r, border);
-        it.filled_circle(x + r, y + r, r, border);
-        it.filled_circle(x + w - r - 1, y + r, r, border);
-        it.filled_circle(x + r, y + h - r - 1, r, border);
-        it.filled_circle(x + w - r - 1, y + h - r - 1, r, border);
-        x++; y++; w -= 2; h -= 2; r = 9;
-        it.filled_rectangle(x + r, y, w - 2*r, h, card);
-        it.filled_rectangle(x, y + r, w, h - 2*r, card);
-        it.filled_circle(x + r, y + r, r, card);
-        it.filled_circle(x + w - r - 1, y + r, r, card);
-        it.filled_circle(x + r, y + h - r - 1, r, card);
-        it.filled_circle(x + w - r - 1, y + h - r - 1, r, card);
+      char b[40];
+      // liczba + jednostka (jednostka mniejsza)
+      auto val = [&](int x, int y, const char *num, const char *unit, font::Font *fn, Color c, bool right) {
+        int x1, y1, w, h, wu = 0;
+        it.get_text_bounds(0, 0, num, fn, TextAlign::BASELINE_LEFT, &x1, &y1, &w, &h);
+        if (unit[0]) it.get_text_bounds(0, 0, unit, id(m10), TextAlign::BASELINE_LEFT, &x1, &y1, &wu, &h);
+        int x0 = right ? x - w - wu - 3 : x;
+        it.print(x0, y, fn, c, TextAlign::BASELINE_LEFT, num);
+        if (unit[0]) it.print(x0 + w + 3, y, id(m10), unitc, TextAlign::BASELINE_LEFT, unit);
       };
 
-      auto qb = [](float t, float a, float c, float b) -> float {
-        return (1-t)*(1-t)*a + 2*(1-t)*t*c + t*t*b;
-      };
-
-      // linia przepływu: (x0,y0) -> ctrl -> (x1,y1); dir: +1 od startu do końca, -1 odwrotnie, 0 brak
-      uint32_t ms = millis();
-      auto flow = [&](float x0, float y0, float cx, float cy, float x1, float y1, Color c, int dir) {
-        Color lc = dir == 0 ? line_off : c;
-        for (int i = 0; i <= 50; i++) {
-          float t = i / 50.0f;
-          it.filled_circle((int) qb(t, x0, cx, x1), (int) qb(t, y0, cy, y1), 2, lc);
-        }
-        if (dir == 0) return;
-        for (int k = 0; k < 3; k++) {
-          float t = fmodf(ms / 1800.0f + k / 3.0f, 1.0f);
-          if (dir < 0) t = 1.0f - t;
-          it.filled_circle((int) qb(t, x0, cx, x1), (int) qb(t, y0, cy, y1), 4, white);
-        }
-      };
-
-      auto fmt_kw = [](float w, char *buf) {
-        float a = fabsf(w);
-        if (a < 1000) sprintf(buf, "%.0f W", a);
-        else sprintf(buf, "%.1f kW", a / 1000.0f);
-      };
-
-      char b[32];
-
-      // ---------- nagłówek ----------
+      // ---------- godzina ----------
       auto now = id(ha_time).now();
       if (now.is_valid()) {
-        it.strftime(16, 28, id(f26), white, TextAlign::BASELINE_LEFT, "%H:%M", now);
-        it.strftime(16, 46, id(f12), muted, TextAlign::BASELINE_LEFT, "%d.%m.%Y", now);
+        now.strftime(b, sizeof(b), "DZISIAJ · %H:%M");
+        it.print(471, 17, id(m10), muted, TextAlign::BASELINE_RIGHT, b);
       }
-      it.print(304, 22, id(f12), muted, TextAlign::BASELINE_RIGHT, "dziś PV");
-      float pvt = id(pv_today).state;
-      if (isnan(pvt)) sprintf(b, "-- kWh"); else sprintf(b, "%.1f kWh", pvt);
-      it.print(304, 42, id(f16), pv_c, TextAlign::BASELINE_RIGHT, b);
-      it.line(16, 56, 304, 56, Color(42,42,42));
-
-      // ---------- linie przepływu ----------
-      int th = 20;
-      flow(86, 134, 86, 230, 160, 230, pv_c,   pv > th ? 1 : 0);
-      flow(160, 230, 226, 230, 226, 230, home_c, load > th ? 1 : 0);
-      flow(72, 300, 72, 230, 160, 230, grid_c, grid > th ? 1 : (grid < -th ? -1 : 0));
-      flow(160, 237, 160, 372, 176, 372, bat_c, bat < -th ? 1 : (bat > th ? -1 : 0));
-      it.filled_circle(160, 230, 7, white);
-      it.filled_circle(160, 230, 5, bg);
 
       // ---------- PV ----------
-      rcard(16, 66, 140, 68, Color(110,72,10));
-      it.image(20, 76, id(i_pv));
-      it.print(74, 88, id(f12), muted, TextAlign::BASELINE_LEFT, "Fotowoltaika");
-      fmt_kw(pv, b);
-      it.print(74, 118, id(f20), white, TextAlign::BASELINE_LEFT, b);
-
-      // ---------- WODA ----------
-      rcard(164, 66, 140, 68, Color(30,76,104));
-      it.image(170, 76, id(i_woda));
-      it.print(216, 88, id(f12), muted, TextAlign::BASELINE_LEFT, "Woda");
-      float wf = id(water_flow).state;
-      if (isnan(wf)) sprintf(b, "-- L/min"); else sprintf(b, "%.0f L/min", wf);
-      it.print(216, 110, id(f16), white, TextAlign::BASELINE_LEFT, b);
-      float wt = id(water_today).state;
-      if (isnan(wt)) sprintf(b, "-- L dziś"); else sprintf(b, "%.0f L dziś", wt);
-      it.print(216, 126, id(f12), muted, TextAlign::BASELINE_LEFT, b);
+      sprintf(b, "%.2f", pv / 1000.0f);
+      val(22, 116, b, "kW", id(b20), white, false);
+      sprintf(b, "PV1 %.2f kW  ·  PV2 %.2f kW", p1 / 1000.0f, p2 / 1000.0f);
+      it.print(24, 128, id(m10), unitc, TextAlign::BASELINE_LEFT, b);
 
       // ---------- DOM ----------
-      rcard(226, 180, 84, 98, Color(32,96,96));
-      it.image(242, 186, id(i_dom));
-      fmt_kw(load, b);
-      it.print(268, 252, id(f16), white, TextAlign::BASELINE_CENTER, b);
-      it.print(268, 270, id(f12), muted, TextAlign::BASELINE_CENTER, "Dom");
+      sprintf(b, "%.2f", ld / 1000.0f);
+      val(465, 107, b, "kW", id(b16), white, true);
 
-      // ---------- SIEĆ ----------
-      rcard(12, 300, 124, 70, Color(36,78,118));
-      it.image(18, 312, id(i_siec));
-      it.print(64, 320, id(f12), muted, TextAlign::BASELINE_LEFT, "Sieć");
-      fmt_kw(grid, b);
-      it.print(64, 344, id(f16), white, TextAlign::BASELINE_LEFT, b);
-      if (grid > th)       it.print(64, 362, id(f12), red,   TextAlign::BASELINE_LEFT, "import");
-      else if (grid < -th) it.print(64, 362, id(f12), green, TextAlign::BASELINE_LEFT, "eksport");
-      else                 it.print(64, 362, id(f12), muted, TextAlign::BASELINE_LEFT, "bilans");
+      // ---------- WODA ----------
+      float wd = id(w_dzis).state, wm = id(w_mies).state;
+      if (isnan(wd)) sprintf(b, "--"); else sprintf(b, "%.2f", wd);
+      val(362, 144, b, "m³", id(b11), white, false);
+      if (isnan(wm)) sprintf(b, "--"); else sprintf(b, "%.2f", wm);
+      val(417, 144, b, "m³", id(b11), white, false);
 
-      // ---------- MAGAZYN (łuk SOC) ----------
-      int cx = 230, cy = 372, R = 46;
-      it.filled_circle(cx, cy, 54, card);
-      for (int a = 0; a < 360; a += 3) {
-        float rad = (a - 90) * 3.14159f / 180.0f;
-        it.filled_circle(cx + (int)(R * cosf(rad)), cy + (int)(R * sinf(rad)), 4, Color(44,35,64));
-      }
-      int end = (int)(360.0f * soc / 100.0f);
-      for (int a = 0; a <= end; a += 2) {
-        float rad = (a - 90) * 3.14159f / 180.0f;
-        it.filled_circle(cx + (int)(R * cosf(rad)), cy + (int)(R * sinf(rad)), 4, bat_c);
-      }
-      it.image(cx - 20, cy - 38, id(i_bat));
-      sprintf(b, "%.0f%%", soc);
-      it.print(cx, cy + 30, id(f16), white, TextAlign::BASELINE_CENTER, b);
-      if (bat < -th) {
-        fmt_kw(bat, b); char s[40]; sprintf(s, "Magazyn  ładuje %s", b);
-        it.print(cx, 444, id(f12), green, TextAlign::BASELINE_CENTER, s);
-      } else if (bat > th) {
-        fmt_kw(bat, b); char s[40]; sprintf(s, "Magazyn  oddaje %s", b);
-        it.print(cx, 444, id(f12), red, TextAlign::BASELINE_CENTER, s);
+      // ---------- SIEĆ (dodatnia = import) ----------
+      sprintf(b, "%.2f", fabsf(gr) / 1000.0f);
+      val(74, 188, b, "kW", id(b16), gr > 20 ? coral : orange, false);
+      it.print(75, 200, id(m10), unitc, TextAlign::BASELINE_LEFT,
+               gr > 20 ? "IMPORT Z SIECI" : (gr < -20 ? "EKSPORT DO SIECI" : "BILANS ZERO"));
+
+      // ---------- MAGAZYN (ujemna = ładowanie) ----------
+      sprintf(b, "%.0f%%", sc);
+      val(269, 191, b, "", id(b16), white, false);
+      if (bt < -20) {
+        it.print(270, 202, id(m10), unitc, TextAlign::BASELINE_LEFT, "ŁADOWANIE");
+        sprintf(b, "+%.2f kW", -bt / 1000.0f);
+        it.print(271, 214, id(b11), orange, TextAlign::BASELINE_LEFT, b);
+      } else if (bt > 20) {
+        it.print(270, 202, id(m10), unitc, TextAlign::BASELINE_LEFT, "ROZŁADOWANIE");
+        sprintf(b, "-%.2f kW", bt / 1000.0f);
+        it.print(271, 214, id(b11), coral, TextAlign::BASELINE_LEFT, b);
       } else {
-        it.print(cx, 444, id(f12), muted, TextAlign::BASELINE_CENTER, "Magazyn");
+        it.print(270, 202, id(m10), unitc, TextAlign::BASELINE_LEFT, "CZUWANIE");
       }
 
-      // ---------- statystyki dnia ----------
-      it.print(16, 400, id(f12), muted, TextAlign::BASELINE_LEFT, "Zużycie dziś");
-      float lt = id(load_today).state;
-      if (isnan(lt)) sprintf(b, "-- kWh"); else sprintf(b, "%.1f kWh", lt);
-      it.print(16, 420, id(f16), white, TextAlign::BASELINE_LEFT, b);
-      it.print(16, 444, id(f12), muted, TextAlign::BASELINE_LEFT, "Autokonsumpcja");
-      float et = id(export_today).state;
-      if (isnan(pvt) || isnan(et) || pvt <= 0.1f) sprintf(b, "--");
-      else sprintf(b, "%.0f%%", 100.0f * (pvt - et) / pvt);
-      it.print(16, 464, id(f16), green, TextAlign::BASELINE_LEFT, b);
+      // ---------- LICZNIKI DZISIAJ ----------
+      auto cnt = [&](int x, sensor::Sensor *s, Color c) {
+        float e = s->state;
+        if (isnan(e)) sprintf(b, "--"); else sprintf(b, "%.1f", e);
+        val(x, 276, b, "kWh", id(b14), c, false);
+      };
+      cnt(49,  id(e_pv),   green);
+      cnt(167, id(e_load), white);
+      cnt(285, id(e_imp),  orange);
+      cnt(396, id(e_exp),  green);
+
+      // ---------- STRZAŁKI (zapalają się po kolei) ----------
+      int step = (millis() / 300) % 4;
+      // jedna strzałka ">" w kierunku (dx,dy)
+      auto chev = [&](int cx, int cy, int dx, int dy, Color c) {
+        int px = -dy, py = dx;
+        for (int o = -1; o <= 1; o++) {
+          int sx = (dx != 0) ? o : 0, sy = (dy != 0) ? o : 0;
+          it.line(cx - dx*3 + px*4 + sx, cy - dy*3 + py*4 + sy, cx + dx*3 + sx, cy + dy*3 + sy, c);
+          it.line(cx - dx*3 - px*4 + sx, cy - dy*3 - py*4 + sy, cx + dx*3 + sx, cy + dy*3 + sy, c);
+        }
+      };
+      // rząd 3 strzałek; dir: 1 = w stronę (dx,dy), -1 = odwrotnie, 0 = brak przepływu
+      auto row = [&](int x0, int y0, int dx, int dy, int dir, Color on) {
+        for (int i = 0; i < 3; i++) {
+          int k = dir >= 0 ? i : 2 - i;
+          bool lit = dir != 0 && (k == step || k == step - 1);
+          int cx = x0 + dx * 7 * i, cy = y0 + dy * 7 * i;
+          chev(cx, cy, dir < 0 ? -dx : dx, dir < 0 ? -dy : dy, lit ? on : dim);
+        }
+      };
+      int th = 20;
+      row(181, 110, 1, 0, pv > th ? 1 : 0, lgreen);                         // PV -> falownik
+      row(271, 110, 1, 0, ld > th ? 1 : 0, lgreen);                         // falownik -> dom
+      row(175, 173, -1, 0, gr < -th ? 1 : (gr > th ? -1 : 0), orange);      // falownik -> sieć (eksport)
+      row(232, 141, 0, 1, bt < -th ? 1 : (bt > th ? -1 : 0), orange);       // falownik -> magazyn (ładowanie)
